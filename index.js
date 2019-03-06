@@ -31,6 +31,7 @@
 			const data = model.getData();
 			model.setActiveIndex(data.indexOf(itemData));
 			view.setImageLink(itemData);
+			view.setPanelIndex(data.indexOf(itemData) + 1);
 			renderList();
 		}
 		view.setOnItemClick(onItemClickHandler);
@@ -58,6 +59,8 @@
 		appContainer.appendChild(addButton);
 
 		const imageView = document.getElementById("image-view");
+
+		const indexPanelView = document.getElementById("index-panel");
 
 		let onItemClick;
 		return {
@@ -94,6 +97,9 @@
 				var imageLink = imageView.getAttribute("src");
 				var newImageLink = imageLink.slice(0, imageLink.length - 1) + n;
 				imageView.setAttribute("src", newImageLink);
+			},
+			setPanelIndex: i => {
+				indexPanelView.innerHTML = i;
 			}
 		}
 	}
