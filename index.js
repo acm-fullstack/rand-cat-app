@@ -1,8 +1,9 @@
-(function () {
+	(function () {
 	/* Stores information and state with manipulations */
 	function Model() {
+		const initialState = [1, 2, 3, 4, 5];
 		const state = {
-			data: [1, 2, 3, 4, 5],
+			data: [...initialState],
 			activeIndex: 0,
 			nicknames: [],
 		};
@@ -19,6 +20,10 @@
 				}
 				state.activeIndex = i;
 			},
+			resetData: () => {
+				state.data = [...initialState];
+				state.activeIndex = 0;
+			},
 			setNickname: (nickname) => {
 				state.nicknames[state.activeIndex] = nickname;
 			},
@@ -29,7 +34,10 @@
 	/* Binds the data to view and responds to user events */
 	function Controller(model, view) {
 		function renderList() {
-			view.renderList(model.getData(), model.getActiveIndex());
+			const data = model.getData();
+			const currIndex = model.getActiveIndex();
+			view.setImageLink(currIndex);
+			view.renderList(data, currIndex);
 		}
 
 		function onItemClickHandler(itemData) {
@@ -49,13 +57,18 @@
 		}
 		view.setOnAddClick(onAddClickHandler);
 
+		function onResetClickHandler (event) {
+			model.resetData();
+			renderList();
+		}
+		view.setOnResetClick(onResetClickHandler);
+    
 		function onSaveButtonClickHandler(event) {
 			const nick = view.getCatNicknameInput();
 			model.setNickname(nick);
 			view.renderNickname(nick);
 		}
 		view.setOnSaveNicknameClick(onSaveButtonClickHandler);
-
 		renderList();
 	}
 
@@ -71,6 +84,10 @@
 		const addButton = document.getElementById("add-button");
 
 		const saveButton = document.getElementById("cat-nickname-save");
+
+		// Delete Button
+		const resetButton = document.getElementById("reset-button");
+
 
 		const imageView = document.getElementById("image-view");
 
@@ -96,6 +113,12 @@
 					};
 					listNode.appendChild(listItem);
 				});
+			},
+			setOnResetClick: handler => {
+				if (typeof handler !== "function") {
+					throw new Error("invalid on reset click handler.");
+				}
+				resetButton.onclick = handler;
 			},
 			setOnAddClick: handler => {
 				if (typeof handler !== "function") {
