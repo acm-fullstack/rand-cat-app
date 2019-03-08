@@ -169,13 +169,13 @@
 			},
 			setPanelIndex: i => {
 				indexPanelView.innerHTML = i;
-      }
+      		},
 			setOnRemoveClick: handler => {
 				if(typeof handler !== "function") {
 					throw new Error("invalid on remove click handler.");	
 				}
 				removeButton.onclick = handler;
-      },
+      		},
 			getCatNicknameInput: () => inputItem.value,
 			renderNickname: (nickname) => {
 				nicknameView.innerHTML = nickname == null ? "" : nickname;
