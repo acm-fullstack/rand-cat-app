@@ -49,6 +49,7 @@
 			const index = data.indexOf(itemData);
 			model.setActiveIndex(index);
 			view.setImageLink(itemData);
+			view.setPanelIndex(data.indexOf(itemData) + 1);
 			const nick = model.getNickname(index);
 			view.renderNickname(nick);
 			renderList();
@@ -113,6 +114,7 @@
 
 		const imageView = document.getElementById("image-view");
 
+		const indexPanelView = document.getElementById("index-panel");
 		const inputItem = document.getElementById("cat-nickname");
 
 		const nicknameView = document.getElementById("nickanme-view");
@@ -165,6 +167,9 @@
 				var newImageLink = imageLink.slice(0, imageLink.length - 1) + n;
 				imageView.setAttribute("src", newImageLink);
 			},
+			setPanelIndex: i => {
+				indexPanelView.innerHTML = i;
+      }
 			setOnRemoveClick: handler => {
 				if(typeof handler !== "function") {
 					throw new Error("invalid on remove click handler.");	
