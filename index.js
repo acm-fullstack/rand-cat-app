@@ -74,17 +74,18 @@
 			renderList();
 		}
 		view.setOnRemoveClick(onRemoveClickHandler);
-		
+
 		function onResetClickHandler (event) {
 			model.resetData();
 			renderList();
 		}
 		view.setOnResetClick(onResetClickHandler);
-    
+
 		function onSaveButtonClickHandler(event) {
 			const nick = view.getCatNicknameInput();
 			model.setNickname(nick);
 			view.renderNickname(nick);
+			view.clearInputNickname();
 		}
 		view.setOnSaveNicknameClick(onSaveButtonClickHandler);
 		renderList();
@@ -172,14 +173,15 @@
       		},
 			setOnRemoveClick: handler => {
 				if(typeof handler !== "function") {
-					throw new Error("invalid on remove click handler.");	
+					throw new Error("invalid on remove click handler.");
 				}
 				removeButton.onclick = handler;
       		},
 			getCatNicknameInput: () => inputItem.value,
 			renderNickname: (nickname) => {
 				nicknameView.innerHTML = nickname == null ? "" : nickname;
-			}
+			},
+			clearInputNickname: () => inputItem.value=" ",
 		}
 	}
 
