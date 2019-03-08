@@ -1,9 +1,11 @@
-(function () {
+	(function () {
 	/* Stores information and state with manipulations */
 	function Model() {
+		const initialState = [1, 2, 3, 4, 5];
 		const state = {
-			data: [1, 2, 3, 4, 5],
+			data: [...initialState],
 			activeIndex: 0,
+			nicknames: [],
 		};
 
 		return {
@@ -21,20 +23,34 @@
 			removeCurrent: () => {
 				state.data.splice(state.activeIndex, 1);
 				state.activeIndex = state.data.length > 0 ? 0 : -1;
-			}
+			},
+			resetData: () => {
+				state.data = [...initialState];
+				state.activeIndex = 0;
+			},
+			setNickname: (nickname) => {
+				state.nicknames[state.activeIndex] = nickname;
+			},
+			getNickname: i => state.nicknames[i]
 		};
 	}
 
 	/* Binds the data to view and responds to user events */
 	function Controller(model, view) {
 		function renderList() {
-			view.renderList(model.getData(), model.getActiveIndex());
+			const data = model.getData();
+			const currIndex = model.getActiveIndex();
+			view.setImageLink(currIndex);
+			view.renderList(data, currIndex);
 		}
 
 		function onItemClickHandler(itemData) {
 			const data = model.getData();
-			model.setActiveIndex(data.indexOf(itemData));
+			const index = data.indexOf(itemData);
+			model.setActiveIndex(index);
 			view.setImageLink(itemData);
+			const nick = model.getNickname(index);
+			view.renderNickname(nick);
 			renderList();
 		}
 		view.setOnItemClick(onItemClickHandler);
@@ -58,6 +74,18 @@
 		}
 		view.setOnRemoveClick(onRemoveClickHandler);
 		
+		function onResetClickHandler (event) {
+			model.resetData();
+			renderList();
+		}
+		view.setOnResetClick(onResetClickHandler);
+    
+		function onSaveButtonClickHandler(event) {
+			const nick = view.getCatNicknameInput();
+			model.setNickname(nick);
+			view.renderNickname(nick);
+		}
+		view.setOnSaveNicknameClick(onSaveButtonClickHandler);
 		renderList();
 	}
 
@@ -70,9 +98,13 @@
 		appContainer.appendChild(listNode);
 
 		// Add Button creation
-		const addButton = document.createElement("button");
-		addButton.innerHTML = "Add Item";
-		appContainer.appendChild(addButton);
+		const addButton = document.getElementById("add-button");
+
+		const saveButton = document.getElementById("cat-nickname-save");
+
+		// Delete Button
+		const resetButton = document.getElementById("reset-button");
+
 
 		// Remove Button creation
 		const removeButton = document.createElement("button");
@@ -80,6 +112,10 @@
 		appContainer.appendChild(removeButton);
 
 		const imageView = document.getElementById("image-view");
+
+		const inputItem = document.getElementById("cat-nickname");
+
+		const nicknameView = document.getElementById("nickanme-view");
 
 		let onItemClick;
 		return {
@@ -100,6 +136,12 @@
 					listNode.appendChild(listItem);
 				});
 			},
+			setOnResetClick: handler => {
+				if (typeof handler !== "function") {
+					throw new Error("invalid on reset click handler.");
+				}
+				resetButton.onclick = handler;
+			},
 			setOnAddClick: handler => {
 				if (typeof handler !== "function") {
 					throw new Error("invalid on add click handler.");
@@ -112,6 +154,12 @@
 				}
 				onItemClick = handler;
 			},
+			setOnSaveNicknameClick: handler => {
+				if (typeof handler !== "function") {
+					throw new Error("invalid on item click handler.");
+				}
+				saveButton.onclick = handler;
+			},
 			setImageLink: n => {
 				var imageLink = imageView.getAttribute("src");
 				var newImageLink = imageLink.slice(0, imageLink.length - 1) + n;
@@ -122,6 +170,10 @@
 					throw new Error("invalid on remove click handler.");	
 				}
 				removeButton.onclick = handler;
+      },
+			getCatNicknameInput: () => inputItem.value,
+			renderNickname: (nickname) => {
+				nicknameView.innerHTML = nickname == null ? "" : nickname;
 			}
 		}
 	}
@@ -134,5 +186,3 @@
 
 	Init();
 })();
-
-
