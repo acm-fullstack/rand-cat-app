@@ -20,6 +20,10 @@
 				}
 				state.activeIndex = i;
 			},
+			removeCurrent: () => {
+				state.data.splice(state.activeIndex, 1);
+				state.activeIndex = state.data.length > 0 ? 0 : -1;
+			},
 			resetData: () => {
 				state.data = [...initialState];
 				state.activeIndex = 0;
@@ -53,10 +57,23 @@
 
 		function onAddClickHandler(event) {
 			model.insertData();
+			if(model.getActiveIndex() === -1) {
+				model.setActiveIndex(0);
+			}
 			renderList();
 		}
 		view.setOnAddClick(onAddClickHandler);
 
+		function onRemoveClickHandler(event) {
+			if(model.getActiveIndex < 0) return; // ignore. list is empty
+			model.removeCurrent();
+			const data = model.getData();
+			const activeIndex = model.getActiveIndex();
+			view.setImageLink(data[activeIndex] || " ");
+			renderList();
+		}
+		view.setOnRemoveClick(onRemoveClickHandler);
+		
 		function onResetClickHandler (event) {
 			model.resetData();
 			renderList();
@@ -88,6 +105,11 @@
 		// Delete Button
 		const resetButton = document.getElementById("reset-button");
 
+
+		// Remove Button creation
+		const removeButton = document.createElement("button");
+		removeButton.innerHTML = "Remove";
+		appContainer.appendChild(removeButton);
 
 		const imageView = document.getElementById("image-view");
 
@@ -143,6 +165,12 @@
 				var newImageLink = imageLink.slice(0, imageLink.length - 1) + n;
 				imageView.setAttribute("src", newImageLink);
 			},
+			setOnRemoveClick: handler => {
+				if(typeof handler !== "function") {
+					throw new Error("invalid on remove click handler.");	
+				}
+				removeButton.onclick = handler;
+      },
 			getCatNicknameInput: () => inputItem.value,
 			renderNickname: (nickname) => {
 				nicknameView.innerHTML = nickname == null ? "" : nickname;
