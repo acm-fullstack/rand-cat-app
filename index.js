@@ -5,6 +5,7 @@
 		const state = {
 			data: [...initialState],
 			activeIndex: 0,
+			nicknames: [],
 		};
 
 		return {
@@ -22,7 +23,11 @@
 			resetData: () => {
 				state.data = [...initialState];
 				state.activeIndex = 0;
-			}
+			},
+			setNickname: (nickname) => {
+				state.nicknames[state.activeIndex] = nickname;
+			},
+			getNickname: i => state.nicknames[i]
 		};
 	}
 
@@ -37,8 +42,11 @@
 
 		function onItemClickHandler(itemData) {
 			const data = model.getData();
-			model.setActiveIndex(data.indexOf(itemData));
+			const index = data.indexOf(itemData);
+			model.setActiveIndex(index);
 			view.setImageLink(itemData);
+			const nick = model.getNickname(index);
+			view.renderNickname(nick);
 			renderList();
 		}
 		view.setOnItemClick(onItemClickHandler);
@@ -54,7 +62,13 @@
 			renderList();
 		}
 		view.setOnResetClick(onResetClickHandler);
-
+    
+		function onSaveButtonClickHandler(event) {
+			const nick = view.getCatNicknameInput();
+			model.setNickname(nick);
+			view.renderNickname(nick);
+		}
+		view.setOnSaveNicknameClick(onSaveButtonClickHandler);
 		renderList();
 	}
 
@@ -67,15 +81,19 @@
 		appContainer.appendChild(listNode);
 
 		// Add Button creation
-		const addButton = document.createElement("button");
-		addButton.innerHTML = "Add Item";
-		appContainer.appendChild(addButton);
+		const addButton = document.getElementById("add-button");
+
+		const saveButton = document.getElementById("cat-nickname-save");
 
 		// Delete Button
 		const resetButton = document.getElementById("reset-button");
 
 
 		const imageView = document.getElementById("image-view");
+
+		const inputItem = document.getElementById("cat-nickname");
+
+		const nicknameView = document.getElementById("nickanme-view");
 
 		let onItemClick;
 		return {
@@ -114,10 +132,20 @@
 				}
 				onItemClick = handler;
 			},
+			setOnSaveNicknameClick: handler => {
+				if (typeof handler !== "function") {
+					throw new Error("invalid on item click handler.");
+				}
+				saveButton.onclick = handler;
+			},
 			setImageLink: n => {
 				var imageLink = imageView.getAttribute("src");
 				var newImageLink = imageLink.slice(0, imageLink.length - 1) + n;
 				imageView.setAttribute("src", newImageLink);
+			},
+			getCatNicknameInput: () => inputItem.value,
+			renderNickname: (nickname) => {
+				nicknameView.innerHTML = nickname == null ? "" : nickname;
 			}
 		}
 	}
@@ -130,5 +158,3 @@
 
 	Init();
 })();
-
-
